@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WebGIS Sebaran Komoditas Pertanian – Kab. Gorontalo &amp; Kab. Bone Bolango (LTKL)</title>
+<meta name="description" content="Peta interaktif sebaran komoditas pertanian/perkebunan di Kabupaten Gorontalo dan Kabupaten Bone Bolango untuk program Commodity Mapping LTKL.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌽</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<button id="panelToggle" class="panel-toggle" aria-controls="panel" aria-expanded="true">Tutup panel</button>
+
+<aside id="panel" class="panel" aria-label="Panel kontrol peta">
+  <header class="panel-head">
+    <h1>Sebaran Komoditas Pertanian</h1>
+    <p class="sub">Kabupaten Gorontalo dan Kabupaten Bone Bolango<br>Commodity Mapping – Lingkar Temu Kabupaten Lestari</p>
+    <nav class="tabs" aria-label="Halaman">
+      <a href="index.html" aria-current="page">Peta interaktif</a>
+      <a href="statistik.html" id="linkStat">Statistik &amp; grafik</a>
+    </nav>
+  </header>
+
+  <section class="block">
+    <h2>Wilayah</h2>
+    <div class="field">
+      <label for="selKab">Kabupaten</label>
+      <select id="selKab"></select>
+    </div>
+    <div class="field">
+      <label for="selKec">Kecamatan</label>
+      <select id="selKec"></select>
+    </div>
+    <div class="field">
+      <label for="selDesa">Desa</label>
+      <select id="selDesa"></select>
+    </div>
+    <p class="hint">Desa kajian</p>
+    <div id="focusChips" class="chips"></div>
+  </section>
+
+  <section class="block">
+    <div class="block-head">
+      <h2>Legenda</h2>
+      <span id="scopeLabel" class="scope"></span>
+    </div>
+    <table class="legend" id="legendTable">
+      <thead><tr><th scope="col"><span class="sr">Tampilkan</span></th><th scope="col">Kelas</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section class="block" id="profileBlock" hidden>
+    <h2>Profil tutupan lahan <span id="profileDesa"></span></h2>
+    <div id="shareBar" class="sharebar" role="img" aria-label="Komposisi luas komoditas"></div>
+    <table class="landuse" id="landuseTable">
+      <thead><tr><th scope="col">Kelas tutupan</th><th scope="col" class="num">Luas (Ha)</th><th scope="col" class="num">%</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div id="galeriWrap" hidden>
+      <h3 class="subh">Foto lapangan</h3>
+      <div id="galeriDesa" class="galeri-mini"></div>
+    </div>
+    <p class="note" id="profileNote"></p>
+  </section>
+
+  <section class="block">
+    <h2>Lapisan peta</h2>
+    <label class="check"><input type="checkbox" id="chkSampel" checked> Titik sampel komoditas</label>
+    <label class="check"><input type="checkbox" id="chkFoto" checked> Lokasi foto lapangan</label>
+    <label class="check"><input type="checkbox" id="chkAdmin" checked> Batas administrasi</label>
+    <label class="check"><input type="checkbox" id="chkLabel" checked> Nama desa</label>
+    <table class="admin-key" aria-label="Keterangan batas administrasi">
+      <tr><td><svg width="34" height="10"><line x1="1" y1="5" x2="33" y2="5" stroke="#000" stroke-opacity=".6" stroke-width="5.2"/><line x1="1" y1="5" x2="33" y2="5" stroke="#fff" stroke-width="3.2"/></svg></td><td>Batas kabupaten</td></tr>
+      <tr><td><svg width="34" height="10"><line x1="1" y1="5" x2="33" y2="5" stroke="#FFB703" stroke-width="2" stroke-dasharray="10 5"/></svg></td><td>Batas kecamatan, Kab. Gorontalo</td></tr>
+      <tr><td><svg width="34" height="10"><line x1="1" y1="5" x2="33" y2="5" stroke="#FFB703" stroke-width="1.2" stroke-dasharray="4 4"/></svg></td><td>Batas desa, Kab. Gorontalo</td></tr>
+      <tr><td><svg width="34" height="10"><line x1="1" y1="5" x2="33" y2="5" stroke="#3FC5F0" stroke-width="2" stroke-dasharray="10 5"/></svg></td><td>Batas kecamatan, Kab. Bone Bolango</td></tr>
+      <tr><td><svg width="34" height="10"><line x1="1" y1="5" x2="33" y2="5" stroke="#3FC5F0" stroke-width="1.2" stroke-dasharray="4 4"/></svg></td><td>Batas desa, Kab. Bone Bolango</td></tr>
+    </table>
+    <div class="field">
+      <label for="rngOpacity">Transparansi poligon <output id="outOpacity">85%</output></label>
+      <input type="range" id="rngOpacity" min="20" max="100" step="5" value="85">
+    </div>
+  </section>
+
+  <footer class="panel-foot">
+    <p>Sumber data: Tim Pemetaan Commodity Mapping LTKL, 2026. Batas administrasi: BIG, 2019. Sistem koordinat: WGS 84.</p>
+  </footer>
+</aside>
+
+<main id="map" aria-label="Peta interaktif"></main>
+<div id="coord" class="coord" aria-live="off">Lat –, Lon –</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="data/komoditas.js"></script>
+<script src="data/batas_admin.js"></script>
+<script src="data/desa.js"></script>
+<script src="data/label_desa.js"></script>
+<script src="data/sampel.js"></script>
+<script src="data/foto_lapangan.js"></script>
+<script src="data/tutupan_lahan.js"></script>
+<script src="data/statistik.js"></script>
+<script src="js/foto-komoditas.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Statistik Komoditas & Tutupan Lahan – LTKL Gorontalo & Bone Bolango</title>
+<meta name="description" content="Dashboard statistik luas komoditas dan tutupan lahan per desa di Kabupaten Gorontalo dan Kabupaten Bone Bolango (Commodity Mapping LTKL).">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/statistik.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-inner">
+    <div>
+      <h1>Statistik komoditas dan tutupan lahan</h1>
+      <p>Kabupaten Gorontalo dan Kabupaten Bone Bolango · Commodity Mapping – Lingkar Temu Kabupaten Lestari</p>
+    </div>
+    <nav class="tabs" aria-label="Halaman">
+      <a href="index.html">Peta interaktif</a>
+      <a href="statistik.html" aria-current="page">Statistik</a>
+    </nav>
+  </div>
+</header>
+
+<div class="filters">
+  <div class="wrap filters-inner">
+    <label>Kabupaten<select id="fKab"></select></label>
+    <label>Kecamatan<select id="fKec"></select></label>
+    <label>Desa<select id="fDesa"></select></label>
+    <label class="tick"><input type="checkbox" id="fHutan"> Tampilkan hutan</label>
+    <button type="button" id="fReset" class="ghost">Atur ulang</button>
+  </div>
+</div>
+
+<main class="wrap">
+  <section class="summary" aria-labelledby="hSum">
+    <h2 id="hSum" class="sr">Ringkasan</h2>
+    <div class="kpis">
+      <div class="kpi lead"><span class="v" id="kKom">–</span><span class="l">Ha lahan komoditas</span></div>
+      <div class="kpi"><span class="v" id="kDom">–</span><span class="l" id="kDomL">komoditas dominan</span></div>
+      <div class="kpi"><span class="v" id="kHut">–</span><span class="l">Ha hutan</span></div>
+      <div class="kpi"><span class="v" id="kDesa">–</span><span class="l" id="kDesaL">desa tercakup</span></div>
+    </div>
+    <div class="finding">
+      <h3>Ringkasan <span id="scopeName"></span></h3>
+      <p id="narasi"></p>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="hGaleri">
+    <div class="table-head">
+      <div>
+        <h3 id="hGaleri">Profil komoditas</h3>
+        <p class="muted"><span id="galeriScope">Seluruh wilayah</span>. Narasi: Laporan Pertengahan Pemetaan Komoditas Unggulan LTKL, 2026.</p>
+      </div>
+    </div>
+    <div id="galeri" class="galeri"></div>
+  </section>
+
+  <section class="grid2">
+    <figure class="panel">
+      <figcaption><h3>Komposisi luas komoditas</h3></figcaption>
+      <div class="chart sq"><canvas id="cDonut" aria-label="Diagram komposisi komoditas" role="img"></canvas></div>
+    </figure>
+    <figure class="panel">
+      <figcaption><h3 id="hUnit">Luas komoditas per kecamatan</h3><p id="pUnit"></p></figcaption>
+      <div class="chart"><canvas id="cUnit" aria-label="Grafik luas komoditas per wilayah" role="img"></canvas></div>
+    </figure>
+  </section>
+
+  <section class="panel" id="fotoPanel" aria-labelledby="hFoto">
+    <div class="table-head">
+      <div>
+        <h3 id="hFoto">Galeri foto lapangan</h3>
+        <p class="muted" id="fotoInfo"></p>
+      </div>
+      <div class="seg" id="fotoFilter" role="group" aria-label="Saring jenis foto">
+        <button type="button" data-f="Semua" aria-pressed="true">Semua</button>
+        <button type="button" data-f="Lahan">Lahan</button>
+        <button type="button" data-f="Lanskap">Lanskap</button>
+        <button type="button" data-f="Pascapanen">Pascapanen</button>
+      </div>
+    </div>
+    <div id="fotoGrid"></div>
+  </section>
+
+  <section class="panel" id="mapPanel" hidden>
+    <div class="split">
+      <div>
+        <h3>Peta cetak desa <span id="mapName"></span></h3>
+        
+        <p><a id="mapLink" class="btn" href="index.html">Lihat di peta interaktif</a></p>
+      </div>
+      <a id="mapImgLink" href="#" target="_blank" rel="noopener"><img id="mapImg" alt="" loading="lazy"></a>
+    </div>
+  </section>
+
+  <figure class="panel">
+    <figcaption><h3>Tutupan lahan</h3><p id="tutupNote"></p></figcaption>
+    <div class="chart tall" id="tutupWrap"><canvas id="cTutup" aria-label="Grafik tutupan lahan" role="img"></canvas></div>
+  </figure>
+
+  <figure class="panel">
+    <figcaption><h3>Komposisi komoditas desa kajian (%)</h3></figcaption>
+    <div class="chart"><canvas id="cFocus" aria-label="Perbandingan komposisi komoditas desa fokus" role="img"></canvas></div>
+  </figure>
+
+  <section class="panel">
+    <div class="table-head">
+      <div>
+        <h3>Tabel luas komoditas per desa (Ha)</h3>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table id="pivot"><thead></thead><tbody></tbody><tfoot></tfoot></table>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p>Sumber data: Tim Pemetaan Commodity Mapping LTKL, 2026. Batas administrasi: BIG, 2019. Satuan luas: hektare (Ha).</p>
+  </footer>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>window.Chart || document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"><\/script>');</script>
+<script src="data/statistik.js"></script>
+<script src="data/foto_lapangan.js"></script>
+<script src="js/foto-komoditas.js"></script>
+<script src="js/statistik.js"></script>
+</body>
+</html>
