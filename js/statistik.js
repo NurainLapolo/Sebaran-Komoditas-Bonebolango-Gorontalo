@@ -27,6 +27,7 @@
   function uniq(a) { return a.filter(function (v, i) { return a.indexOf(v) === i; }).sort(function (x, y) { return x.localeCompare(y); }); }
   function sumBy(rows, key) { var o = {}; rows.forEach(function (r) { o[r[key]] = (o[r[key]] || 0) + r.LUAS_HA; }); return o; }
   function pct(a, b) { return b ? a / b * 100 : 0; }
+  function persen(p) { return p > 0 && p < 0.05 ? '<0,1' : nf1.format(p); }
 
   var DESA = {};
   DATA.forEach(function (r) { DESA[r.ID_DESA] = { id: r.ID_DESA, desa: r.DESA, kec: r.KEC, kab: r.KAB }; });
@@ -133,14 +134,15 @@
       var ada = !!by[k]; var info = KAT[k] || {};
       var card = document.createElement('article');
       card.className = 'kartu' + (ada ? '' : ' absen');
+      card.style.setProperty('--c', col(k));
       var nDesa = ada ? Object.keys(desaN[k]).length : 0;
       card.innerHTML =
-        '<div class="foto" style="--c:' + col(k) + '"><span class="tag" style="background:' + col(k) + '"></span></div>' +
+        '<div class="foto kosong"><span class="tag" style="background:' + col(k) + '"></span></div>' +
         '<div class="isi">' +
-          '<h4>' + esc(k) + '</h4>' +
+          '<h4><span class="sw-k" style="background:' + col(k) + '"></span>' + esc(k) + '</h4>' +
           (info.ilmiah ? '<p class="ilmiah">' + esc(info.ilmiah) + '</p>' : '') +
           (ada
-            ? '<p class="angka"><strong>' + nf.format(by[k]) + ' Ha</strong> · ' + nf1.format(pct(by[k], tot)) + '% · ' + nDesa + ' desa</p>' +
+            ? '<p class="angka"><strong>' + nf.format(by[k]) + ' Ha</strong> · ' + persen(pct(by[k], tot)) + '% · ' + nDesa + ' desa</p>' +
               (nDesa > 1 ? '<p class="terluas">Terluas di ' + esc(DESA[desaTop[k]].desa) + ' (' + nf0.format(desaN[k][desaTop[k]]) + ' Ha)</p>' : '')
             : '<p class="angka">Tidak terdapat di wilayah ini</p>') +
           '<p class="ket">' + esc(window.FotoKomoditas ? window.FotoKomoditas.narasi(k, state.desa !== ALL ? state.desa : null) : '') + '</p>' +
@@ -149,7 +151,8 @@
       box.appendChild(card);
       if (window.FotoKomoditas) {
         window.FotoKomoditas.ambil(k, state.desa !== ALL ? state.desa : null).then(function (f) {
-          if (!f) { card.querySelector('.foto').classList.add('kosong'); return; }
+          if (!f) return;
+          card.querySelector('.foto').classList.remove('kosong');
           var img = new Image(); img.alt = 'Foto lapangan ' + f.ket; img.loading = 'lazy'; img.src = f.thumb;
           img.title = 'Klik untuk memperbesar';
           img.addEventListener('click', function () { window.FotoKomoditas.lightbox([f], 0); });
